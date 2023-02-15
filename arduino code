@@ -1,0 +1,46 @@
+#include <Stepper.h>
+
+const int stepsPerRevolution = 200;  // change this value to match your motor
+
+// create a Stepper object
+Stepper myStepper(stepsPerRevolution, 8, 9, 10, 11);
+
+// define the pins for the switch and the resistor
+const int switchPin1 = 2;
+const int switchPin2 = 3;
+const int resistorPin = A0;
+
+// set the value of the resistor in ohms
+const float resistorValue = 0.1;  // 0.1 ohm resistor
+
+// set the threshold value for the voltage across the resistor
+const float voltageThreshold = 0.1;  // adjust this value as needed
+
+void setup() {
+  pinMode(switchPin1, INPUT);
+  pinMode(switchPin2, INPUT);
+  pinMode(resistorPin, INPUT);
+  myStepper.setSpeed(60);  // set the speed of the motor in revolutions per minute
+}
+
+void loop() {
+  // read the state of the switch pins
+  int switchState1 = digitalRead(switchPin1);
+  int switchState2 = digitalRead(switchPin2);
+
+  // read the voltage across the resistor
+  float voltage = analogRead(resistorPin) * 5.0 / 1023.0;
+
+  if (switchState1 == HIGH && switchState2 == LOW && voltage < voltageThreshold) {
+    // move the motor one step in one direction
+    myStepper.step(1);
+    delay(10);
+  } else if (switchState1 == LOW && switchState2 == HIGH && voltage < voltageThreshold) {
+    // move the motor one step in the other direction
+    myStepper.step(-1);
+    delay(10);
+  } else {
+    // stop the motor
+    myStepper.step(0);
+  }
+}
